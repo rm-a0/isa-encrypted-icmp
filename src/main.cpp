@@ -8,5 +8,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if (argParser.isServer()) {
+        printf("Initialize server\n");
+    }
+    else {
+        printf("Initialize client\n");
+    }
+
     return 0;
 }
