@@ -9,11 +9,14 @@ bool ArgParser::parse() {
         std::string arg = argv[i];
         if (arg == "-r" && i + 1 < argc) {
             filePath = argv[++i];
-        } else if (arg == "-s" && i + 1 < argc) {
+        } 
+        else if (arg == "-s" && i + 1 < argc) {
             targetAddress = argv[++i];
-        } else if (arg == "-l") {
+        } 
+        else if (arg == "-l") {
             serverFlag = true;
-        } else {
+        } 
+        else {
             displayHelp();
             return false;
         }
