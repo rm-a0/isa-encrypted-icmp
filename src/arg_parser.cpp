@@ -35,7 +35,7 @@ bool ArgParser::parse() {
 }
 
 void ArgParser::displayHelp() {
-    std::cout << "Usage: ./secret [options]\n"
+    std::cout << "Usage: " << argv[0] << " [options]\n"
             << "\nOptions:\n"
             << "  -r <file>            Specifies the file to transfer\n"
             << "  -s <ip|hostname>     Target IP or hostname\n"

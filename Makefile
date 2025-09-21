@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Iinc
+CXXFLAGS = -std=c++17 -Wall -Iinc
 LDLIBS = -lpcap -lssl -lcrypto
 SRCDIR = src
 INCDIR = inc
