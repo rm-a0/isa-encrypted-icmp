@@ -3,17 +3,7 @@
 #include <filesystem>
 #include <iostream>
 
-FileHandler::FileHandler(size_t maxChunkSize) : maxChunkSize(maxChunkSize) {
-    try {
-        serverWriteDir = std::filesystem::current_path().string();
-    } 
-    catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Failed to get current directory: " << e.what() << std::endl;
-        serverWriteDir = ".";
-    }
-}
-
-bool FileHandler::readFile(const std::string& path, std::vector<uint8_t>& data) {
+bool file_handler::readFile(const std::string& path, std::vector<uint8_t>& data) {
     data.clear();
 
     std::ifstream file(path, std::ios::binary | std::ios::ate);
@@ -49,6 +39,6 @@ bool FileHandler::readFile(const std::string& path, std::vector<uint8_t>& data) 
     return true;
 }
 
-bool FileHandler::writeFile(const std::string& name, const std::vector<uint8_t>& data) {
+bool file_handler::writeFile(const std::string& name, const std::vector<uint8_t>& data) {
     return true;
 }
