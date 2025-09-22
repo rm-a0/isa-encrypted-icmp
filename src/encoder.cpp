@@ -53,7 +53,7 @@ bool encoder::encrypt(std::vector<uint8_t>& data, std::vector<uint8_t>& key,
 
 /* source: https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption adapted to fit C++ standard*/
 bool encoder::decrypt(std::vector<uint8_t>& cipherData, std::vector<uint8_t>& key,
-             std::vector<uint8_t>& iv, std::vector<uint8_t>& data) {
+                      std::vector<uint8_t>& iv, std::vector<uint8_t>& data) {
     if (key.size() != KEY_SIZE || iv.size() != IV_SIZE) {
         std::cerr << "Incorrect key or IV size" << std::endl;
         return false;
