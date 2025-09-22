@@ -4,8 +4,8 @@
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 
-#define KEY_SIZE 32
-#define IV_SIZE 16
+constexpr size_t KEY_SIZE = 32;
+constexpr size_t IV_SIZE  = 16;
 
 /* source: https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption adapted to fit C++ standard*/
 bool encoder::encrypt(std::vector<uint8_t>& data, std::vector<uint8_t>& key, 
