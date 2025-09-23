@@ -95,7 +95,7 @@ bool encoder::decrypt(std::vector<uint8_t>& cipherData, std::vector<uint8_t>& ke
     return true; 
 }
 
-std::vector<uint8_t> encoder::deriveKey(std::string& login) {
+std::vector<uint8_t> encoder::deriveKey(const std::string& login) {
     std::vector<uint8_t> key(KEY_SIZE);
     unsigned char hash[SHA256_DIGEST_LENGTH];
 

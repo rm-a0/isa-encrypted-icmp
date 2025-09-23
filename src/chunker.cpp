@@ -1,7 +1,7 @@
 #include "chunker.hpp"
 
 chunker::ByteVector2D chunker::chunkData(std::vector<uint8_t>& data, size_t maxChunkSize) {
-    std::vector<std::vector<uint8_t>> chunks;
+    chunker::ByteVector2D chunks;
     size_t offset = 0;
 
     while (offset < data.size()) {

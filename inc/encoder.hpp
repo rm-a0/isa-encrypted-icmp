@@ -40,7 +40,7 @@ namespace encoder {
      * @param login login string
      * @return Derived key stored in vector
      */
-    std::vector<uint8_t> deriveKey(std::string& login);
+    std::vector<uint8_t> deriveKey(const std::string& login);
 
     /**
      * @brief Generates random 128-bit IV

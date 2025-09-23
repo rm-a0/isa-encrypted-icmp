@@ -5,9 +5,9 @@
 #include "protocol.hpp"
 #include <iostream>
 
-Client::Client(std::string filePath, 
-               std::string targetAddress,
-               std::string xlogin,
+Client::Client(const std::string filePath, 
+               const std::string targetAddress,
+               const std::string xlogin,
                size_t maxChunkSize)
     : filePath(std::move(filePath)), 
       targetAddress(std::move(targetAddress)), 
@@ -68,12 +68,15 @@ bool Client::run(void) {
             return false;
         }
 
+        int cnt = 0;
         for (auto& packet : packets) {
+            cnt++;
             std::cout << "[DEBUG] Packet info" << std::endl
                       << "        MagicNum: " << std::hex << packet->magicNum << std::endl
                       << "        Type    : " << (int)packet->packetType << std::endl
                       << "        Version : " << static_cast<int>(packet->version) << std::endl;
         }
+        std::cout << "cnt: " << cnt << std::endl;
         return true;
     } catch (const std::invalid_argument& e) {
         std::cerr << "[CLIENT] Invalid input: " << e.what() << std::endl;

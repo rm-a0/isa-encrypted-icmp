@@ -19,9 +19,9 @@ public:
      * @param xlogin Login for key derivation
      * @param maxChunkSize Maximum chunk size
      */
-    Client(std::string filePath, 
-           std::string targetAddress,
-           std::string xlogin = "xrepcim00", 
+    Client(const std::string filePath, 
+           const std::string targetAddress,
+           const std::string xlogin = "xrepcim00", 
            size_t maxChunkSize = 1400);
 
     /**
@@ -31,10 +31,10 @@ public:
     bool run(void);
 
 private:
-    std::string filePath;           ///< Path to the file
-    std::string targetAddress;      ///< Target IP or hostname
-    std::string xlogin;             ///< xlogin for key derivation
-    size_t maxChunkSize;            ///< Maximum chunk size
+    const std::string filePath;         ///< Path to the file
+    const std::string targetAddress;    ///< Target IP or hostname
+    const std::string xlogin;           ///< xlogin for key derivation
+    size_t maxChunkSize;                ///< Maximum chunk size
 
     /**
      * @brief Process file - read, encrypt, chunk and packet file
