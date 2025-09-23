@@ -24,16 +24,31 @@ public:
            std::string xlogin = "xrepcim00", 
            size_t maxChunkSize = 1400);
 
-    bool processFile(void);
-
-    bool transmitPackets(void);
+    /**
+     * @brief Encapsulates all private sub-processes
+     * @return True if no issues, False if there was an error
+     */
+    bool run(void);
 
 private:
     std::string filePath;           ///< Path to the file
     std::string targetAddress;      ///< Target IP or hostname
     std::string xlogin;             ///< xlogin for key derivation
     size_t maxChunkSize;            ///< Maximum chunk size
-    PacketVector packets;           ///< Vector of packets to be sent
+
+    /**
+     * @brief Process file - read, encrypt, chunk and packet file
+     * @param packets Output vector containing all file related packets
+     * @return True if no issues, False if there was an error
+     */
+    bool packageFile(PacketVector& packets);
+
+
+    /**
+     * @brief Serialize packets, consturct icmp ones, send them to the target
+     * @return True if no issues, False if there was an error
+     */
+    bool transmitPackets(void);
 };
 
 #endif // CLIENT_HPP

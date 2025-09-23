@@ -1,4 +1,8 @@
 # Encrypted File Transfer
+> [!IMPORTANT]  
+> For compilation of this project you NEED C++17 or higher (for std::variant and filesystem)
+> Minimal GNU Make 3.80+ required, Makefile uses wildcards and pattern rules, older versions of make do NOT support them
+> This project was compiled and tests on `merlin.fit.vutbr` server with GNU Make 4.3 and GCC 12.5.0 (C++22)
 ## Assignment Details
 
 **Course:** ISA - Network Applications and Network Administration  

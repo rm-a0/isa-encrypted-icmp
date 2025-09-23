@@ -11,17 +11,11 @@ int main(int argc, char* argv[]) {
 
     if (argParser.isServer()) {
         // Server server();
-        // server.capturePackets()
+        // server.run()
     }
     else {
         Client client(argParser.getFilePath(), argParser.getTargetAddress());
-        if (!client.processFile()) {
-            std::cout << "Error: Client failed to process file" << std::endl;
-            return 1;
-        }
-
-        if (!client.transmitPackets()) {
-            std::cout << "Error: Client failed to transmit packets" << std::endl;
+        if (!client.run()) {
             return 1;
         }
     }

@@ -23,11 +23,11 @@ bool ArgParser::parse(void) {
     }
 
     if (filePath.empty() && !serverFlag) {
-        std::cerr << "Error: Missing required argument -r <file>" << std::endl;
+        std::cerr << "[ARG_PARSER] Error: Missing required argument -r <file>" << std::endl;
         return false;
     }
     if (targetAddress.empty() && !serverFlag) {
-        std::cerr << "Error: Missing required argument -s <ip|hostname>" << std::endl;
+        std::cerr << "[ARG_PARSER] Error: Missing required argument -s <ip|hostname>" << std::endl;
         return false;
     }
 
