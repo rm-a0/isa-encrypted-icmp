@@ -1,3 +1,7 @@
+/**
+ * @file file_handler.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "file_handler.hpp"
 #include <fstream>
 #include <filesystem>

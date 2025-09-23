@@ -1,3 +1,7 @@
+/**
+ * @file encoder.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "encoder.hpp"
 #include <iostream>
 #include <openssl/evp.h>

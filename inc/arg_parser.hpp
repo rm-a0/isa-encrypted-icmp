@@ -1,3 +1,7 @@
+/**
+ * @file arg_parser.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef ARG_PARSER_HPP
 #define ARG_PARSER_HPP
 

@@ -1,3 +1,7 @@
+/**
+ * @file protocol.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 

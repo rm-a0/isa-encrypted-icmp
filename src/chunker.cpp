@@ -1,3 +1,7 @@
+/**
+ * @file chunker.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "chunker.hpp"
 
 chunker::ByteVector2D chunker::chunkData(std::vector<uint8_t>& data, size_t maxChunkSize) {

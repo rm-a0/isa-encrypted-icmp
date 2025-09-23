@@ -1,3 +1,7 @@
+/**
+ * @file encoder.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef ENCODER_HPP
 #define ENCODER_HPP
 

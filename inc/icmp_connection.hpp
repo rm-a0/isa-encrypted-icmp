@@ -1,3 +1,7 @@
+/**
+ * @file icmp_connection.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef ICMP_CONNECTION_HPP
 #define ICMP_CONNECTION_HPP
 

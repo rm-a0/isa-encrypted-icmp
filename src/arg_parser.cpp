@@ -1,3 +1,7 @@
+/**
+ * @file arg_parser.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "arg_parser.hpp"
 #include <iostream>
 

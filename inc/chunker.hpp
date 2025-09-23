@@ -1,3 +1,7 @@
+/**
+ * @file chunker.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef CHUNKER_HPP
 #define CHUNKER_HPP
 

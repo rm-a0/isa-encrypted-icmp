@@ -1,3 +1,7 @@
+/**
+ * @file main.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "arg_parser.hpp"
 #include "client.hpp"
 #include <iostream>

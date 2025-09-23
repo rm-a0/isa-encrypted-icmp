@@ -1,3 +1,7 @@
+/**
+ * @file client.cpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #include "client.hpp"
 #include "file_handler.hpp"
 #include "encoder.hpp"

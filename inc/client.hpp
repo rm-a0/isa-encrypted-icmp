@@ -1,3 +1,7 @@
+/**
+ * @file client.hpp
+ * @author Michal Repcik (xrepcim00)
+ */
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
