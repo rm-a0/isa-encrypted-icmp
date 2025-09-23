@@ -46,7 +46,7 @@ namespace net_utils {
      * @param length Size of passed data
      * @return Calculated IPv4 checksum
      */
-    uint16_t computeICMPChecksum(const uint8_t* data, size_t length);
+    uint16_t computeIPv4Checksum(const uint8_t* data, size_t length);
 
     /**
      * @brief Calculates IPv6 checksum
@@ -56,9 +56,9 @@ namespace net_utils {
      * @param dstAddr Destination address
      * @return Calculated IPv6 checksum
      */
-    uint16_t computeICMPv6Checksum(const uint8_t* data, size_t length, 
-                                   const struct sockaddr_in6& srcAddr, 
-                                   const struct sockaddr_in6& dstAddr);
+    uint16_t computeIPv6Checksum(const uint8_t* data, size_t length, 
+                                 const struct sockaddr_in6& srcAddr, 
+                                 const struct sockaddr_in6& dstAddr);
 }
 
 #endif // NET_UTILS_HPP
