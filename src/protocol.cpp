@@ -1,23 +1,144 @@
 #include "protocol.hpp"
 #include <cstring>
-#include <memory>
+#include <arpa/inet.h>
+#include <stdexcept>
 
-protocol::PacketPtr protocol::buildPacket(std::vector<uint8_t>&& chunk,
-                                          uint32_t seqNum,
-                                          uint32_t totalChunks) {
-    return std::make_unique<protocol::Packet>(std::move(chunk), 
-                                              seqNum, 
-                                              totalChunks);
+namespace protocol {
+
+std::vector<uint8_t> Metadata::serialize() const {
+    std::vector<uint8_t> out;
+
+    uint8_t nameLen = static_cast<uint8_t>(fileName.size());
+    out.push_back(nameLen);
+    out.insert(out.end(), fileName.begin(), fileName.end());
+
+    uint32_t fs = htonl(fileSize);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&fs), reinterpret_cast<uint8_t*>(&fs) + sizeof(fs));
+
+    uint32_t tc = htonl(totalChunks);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&tc), reinterpret_cast<uint8_t*>(&tc) + sizeof(tc));
+
+    out.insert(out.end(), iv.begin(), iv.end());
+
+    return out;
 }
 
-protocol::PacketPtr protocol::parsePacket(const uint8_t* icmpPayload, size_t len) {
-    uint32_t seqNum;
-    uint32_t totalChunks;
+Metadata Metadata::deserialize(const uint8_t* data, size_t len) {
+    Metadata meta;
+    size_t offset = 0;
 
-    std::memcpy(&seqNum, icmpPayload, sizeof(uint32_t));
-    std::memcpy(&totalChunks, icmpPayload + sizeof(uint32_t), sizeof(uint32_t));
+    if (len < 1 + sizeof(uint32_t)*2) {
+        throw std::runtime_error("Invalid metadata length");
+    }
 
-    std::vector<uint8_t> chunk(icmpPayload + 2 * sizeof(uint32_t), icmpPayload + len);
+    uint8_t nameLen = data[offset++];
+    meta.fileName = std::string(reinterpret_cast<const char*>(data + offset), nameLen);
+    offset += nameLen;
 
-    return std::make_unique<protocol::Packet>(std::move(chunk), seqNum, totalChunks);
+    std::memcpy(&meta.fileSize, data + offset, sizeof(meta.fileSize));
+    meta.fileSize = ntohl(meta.fileSize);
+    offset += sizeof(meta.fileSize);
+
+    std::memcpy(&meta.totalChunks, data + offset, sizeof(meta.totalChunks));
+    meta.totalChunks = ntohl(meta.totalChunks);
+    offset += sizeof(meta.totalChunks);
+
+    meta.iv.assign(data + offset, data + len);
+
+    return meta;
+}
+
+std::vector<uint8_t> Data::serialize() const {
+    std::vector<uint8_t> out;
+
+    uint32_t cn = htonl(chunkNum);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&cn), reinterpret_cast<uint8_t*>(&cn) + sizeof(cn));
+    out.insert(out.end(), payload.begin(), payload.end());
+
+    return out;
+}
+
+Data Data::deserialize(const uint8_t* data, size_t len) {
+    Data d;
+
+    if (len < sizeof(uint32_t)) {
+        throw std::runtime_error("Invalid data packet length");
+    }
+
+    std::memcpy(&d.chunkNum, data, sizeof(d.chunkNum));
+    d.chunkNum = ntohl(d.chunkNum);
+
+    d.payload.assign(data + sizeof(d.chunkNum), data + len);
+    return d;
+}
+
+PacketPtr buildMetadataPacket(const Metadata& meta) {
+    auto pkt = std::make_unique<Packet>();
+    pkt->packetType = METADATA;
+    pkt->payload = meta;
+    return pkt;
+}
+
+PacketPtr buildDataPacket(const Data& d) {
+    auto pkt = std::make_unique<Packet>();
+    pkt->packetType = DATA;
+    pkt->payload = d;
+    return pkt;
+}
+
+std::vector<uint8_t> serializePacket(const Packet& pkt) {
+    std::vector<uint8_t> out;
+
+    uint32_t mn = htonl(pkt.magicNum);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&mn), reinterpret_cast<uint8_t*>(&mn) + sizeof(mn));
+
+    out.push_back(pkt.version);
+    out.push_back(static_cast<uint8_t>(pkt.packetType));
+
+    std::vector<uint8_t> payload;
+
+    if (pkt.packetType == METADATA) {
+        const Metadata& meta = std::get<Metadata>(pkt.payload);
+        payload = meta.serialize();
+    } 
+    else if (pkt.packetType == DATA) {
+        const Data& data = std::get<Data>(pkt.payload);
+        payload = data.serialize();
+    } 
+    else {
+        throw std::runtime_error("Unknown packet type");
+    }
+
+    out.insert(out.end(), payload.begin(), payload.end());
+    return out;
+}
+
+PacketPtr parsePacket(const uint8_t* data, size_t len) {
+    if (len < sizeof(uint32_t) + 2) return nullptr;
+
+    auto pkt = std::make_unique<Packet>();
+    size_t offset = 0;
+
+    std::memcpy(&pkt->magicNum, data + offset, sizeof(pkt->magicNum));
+    pkt->magicNum = ntohl(pkt->magicNum);
+    offset += sizeof(pkt->magicNum);
+
+    pkt->version = data[offset++];
+    pkt->packetType = static_cast<PacketType>(data[offset++]);
+
+    size_t payloadLen = len - offset;
+
+    if (pkt->packetType == METADATA) {
+        pkt->payload = Metadata::deserialize(data + offset, payloadLen);
+    } 
+    else if (pkt->packetType == DATA) {
+        pkt->payload = Data::deserialize(data + offset, payloadLen);
+    } 
+    else {
+        throw std::runtime_error("Unknown packet type during parse");
+    }
+
+    return pkt;
+}
+
 }

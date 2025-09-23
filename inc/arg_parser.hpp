@@ -20,13 +20,13 @@ public:
      * @brief Parses command line arguments
      * @return True if no issues, False if there was an error
      */
-    bool parse();
+    bool parse(void);
 
     /**
      * @brief Displays help message (expected arguments)
      * @return void
      */
-    void displayHelp();
+    void displayHelp(void);
 
     /**
      * @brief Getters for better encapsulation and safety

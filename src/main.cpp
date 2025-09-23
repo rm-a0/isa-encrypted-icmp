@@ -19,6 +19,11 @@ int main(int argc, char* argv[]) {
             std::cout << "Error: Client failed to process file" << std::endl;
             return 1;
         }
+
+        if (!client.transmitPackets()) {
+            std::cout << "Error: Client failed to transmit packets" << std::endl;
+            return 1;
+        }
     }
 
     return 0;

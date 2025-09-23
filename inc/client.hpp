@@ -22,7 +22,7 @@ public:
     Client(std::string filePath, 
            std::string targetAddress,
            std::string xlogin = "xrepcim00", 
-           size_t maxChunkSize = 13000);
+           size_t maxChunkSize = 1400);
 
     bool processFile(void);
 

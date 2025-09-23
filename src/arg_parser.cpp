@@ -4,7 +4,7 @@
 ArgParser::ArgParser(int argc, char* argv[]) 
     : argc(argc), argv(argv), serverFlag(false) {}
 
-bool ArgParser::parse() {
+bool ArgParser::parse(void) {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "-r" && i + 1 < argc) {
@@ -34,7 +34,7 @@ bool ArgParser::parse() {
     return true;
 }
 
-void ArgParser::displayHelp() {
+void ArgParser::displayHelp(void) {
     std::cout << "Usage: " << argv[0] << " [options]\n"
               << "\nOptions:\n"
               << "  -r <file>            Specifies the file to transfer\n"
