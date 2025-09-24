@@ -7,6 +7,7 @@
 #include "encoder.hpp"
 #include "chunker.hpp"
 #include "protocol.hpp"
+#include "icmp_connection.hpp"
 #include <iostream>
 
 Client::Client(const std::string filePath, 
@@ -72,6 +73,7 @@ bool Client::run(void) {
             return false;
         }
 
+        // DEBUG
         int cnt = 0;
         for (auto& packet : packets) {
             cnt++;
@@ -81,6 +83,14 @@ bool Client::run(void) {
                       << "        Version : " << static_cast<int>(packet->version) << std::endl;
         }
         std::cout << "cnt: " << cnt << std::endl;
+        // DEBUG
+
+        ICMPConnection icmpConnection(targetAddress);
+        if (!icmpConnection.connect()) {
+            std::cerr << "[CLIENT] Failed to establish connection to the server" << std::endl;
+            return false;
+        }
+
         return true;
     } catch (const std::invalid_argument& e) {
         std::cerr << "[CLIENT] Invalid input: " << e.what() << std::endl;

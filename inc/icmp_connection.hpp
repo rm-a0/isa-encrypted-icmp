@@ -23,13 +23,12 @@ public:
 
     ~ICMPConnection();
 
-    bool sendPacket();
+    bool connect(void);
+
+    bool sendPacket(void);
 private:
-    uint16_t computeChecksum(const uint8_t* buffer, size_t size);
-
-    bool convertToIPv4(const std::string& targetAddress, sockaddr_in ipv4);
-
-    struct sockaddr_in dest_addr_;
+    const std::string targetAddress;
+    int sockfd;
 };
 
 #endif // ICMP_CONNECTION_HPP
