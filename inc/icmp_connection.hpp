@@ -14,21 +14,44 @@
 
 /**
  * @class ICMPConnection
- * @brief 
+ * @brief Class responsible for establishing and maintaining ICMP connection
  */
 class ICMPConnection {
 public:
-
+    /**
+     * @brief Constructor for ICMPConnection class
+     * @param targetAddress IP/hostname of the server
+     */
     ICMPConnection(const std::string& targetAddress);
 
+    /**
+     * @brief Desrtructor for ICMPConnection class (closes ocket)
+     */
     ~ICMPConnection();
 
+    
+    /**
+     * @brief Delete move and copy operators to satisfy the Rule of Five
+     */ 
+    ICMPConnection(const ICMPConnection&) = delete;
+    ICMPConnection& operator=(const ICMPConnection&) = delete;
+    ICMPConnection(ICMPConnection&&) = delete;
+    ICMPConnection& operator=(ICMPConnection&&) = delete;
+
+    /**
+     * @brief Resolves target IP Address, initializes raw socekt
+     * @return True if no issues, False if there was an error
+     */
     bool connect(void);
 
+    /**
+     * @brief Send ICMP Packet to the target address
+     * @return True if no issues, False if there was an error
+     */
     bool sendPacket(void);
 private:
-    const std::string targetAddress;
-    int sockfd;
+    const std::string targetAddress;    ///< IP/hostname of the server
+    int sockfd;                         ///< Socket
 };
 
 #endif // ICMP_CONNECTION_HPP

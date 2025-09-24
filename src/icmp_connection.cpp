@@ -24,7 +24,7 @@ bool ICMPConnection::connect(void) {
 
     int result = net_utils::resolveAddress(targetAddress, addr4, addr6) == net_utils::ERR;
     if (result == net_utils::ERR) {
-        std::cerr << "Could not resolve target address" << std::endl;
+        std::cerr << "[ICMP_CONNECTION] Could not resolve target address" << std::endl;
         return false;
     }
 
@@ -40,7 +40,7 @@ bool ICMPConnection::connect(void) {
 
     sockfd = socket(domain, SOCK_RAW, protocol);
     if (sockfd < 0) {
-        std::cerr << "Could not initialize raw socket" << std::endl;
+        std::cerr << "[ICMP_CONNECTION] Could not initialize raw socket" << std::endl;
         return false;
     }
 
