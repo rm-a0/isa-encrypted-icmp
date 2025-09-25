@@ -7,6 +7,7 @@
 
 #include <string>
 #include <protocol.hpp>
+#include "icmp_connection.hpp"
 
 /**
  * @class Client
@@ -50,9 +51,11 @@ private:
 
     /**
      * @brief Serialize packets, consturct icmp ones, send them to the target
+     * @param packets Vector containing packets waiting to be sent
+     * @param connection Instance of established connection to the server
      * @return True if no issues, False if there was an error
      */
-    bool transmitPackets(void);
+    bool transmitPackets(PacketVector& packets, ICMPConnection& connection);
 };
 
 #endif // CLIENT_HPP

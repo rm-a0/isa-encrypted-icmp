@@ -7,7 +7,6 @@
 #include "encoder.hpp"
 #include "chunker.hpp"
 #include "protocol.hpp"
-#include "icmp_connection.hpp"
 #include <iostream>
 
 Client::Client(const std::string filePath, 
@@ -61,7 +60,16 @@ bool Client::packageFile(Client::PacketVector& packets) {
     return true;
 }
 
-bool Client::transmitPackets(void) {
+bool Client::transmitPackets(PacketVector& packets, ICMPConnection& connection) {
+    for (auto& packet : packets) {
+        auto serialized = protocol::serializePacket(*packet);
+         
+        if (!connection.sendPacket(serialized.data(), serialized.size())) {
+            return false;
+        }
+    }
+
+    std::cout << "all packets sent successfully" << std::endl;
     return true;
 }
 
@@ -69,7 +77,7 @@ bool Client::run(void) {
     try {
         Client::PacketVector packets;
         if (!packageFile(packets)) {
-            std::cerr << "[CLIENT] Failed to package file into packets: " << std::endl;
+            std::cerr << "[CLIENT] Failed to package file into packets" << std::endl;
             return false;
         }
 
@@ -88,6 +96,11 @@ bool Client::run(void) {
         ICMPConnection icmpConnection(targetAddress);
         if (!icmpConnection.connect()) {
             std::cerr << "[CLIENT] Failed to establish connection to the server" << std::endl;
+            return false;
+        }
+
+        if (!transmitPackets(packets, icmpConnection)) {
+            std::cerr << "[CLIENT] Failed to transmit packets" << std::endl;
             return false;
         }
 
