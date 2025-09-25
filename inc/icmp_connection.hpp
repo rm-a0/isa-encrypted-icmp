@@ -46,12 +46,17 @@ public:
 
     /**
      * @brief Send ICMP Packet to the target address
+     * @param payload Data to be sent
+     * @param payloadSize Size of the data that is supposed to be sent
      * @return True if no issues, False if there was an error
      */
-    bool sendPacket(void);
+    bool sendPacket(const uint8_t* payload, size_t payloadSize);
 private:
     const std::string targetAddress;    ///< IP/hostname of the server
     int sockfd;                         ///< Socket
+    bool isIPv4;                        ///< Protocol type
+    struct sockaddr_in addr4;           ///< IPv4 address
+    struct sockaddr_in6 addr6;          ///< IPv6 address
 };
 
 #endif // ICMP_CONNECTION_HPP

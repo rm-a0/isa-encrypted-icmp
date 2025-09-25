@@ -18,7 +18,7 @@ public:
      * @param argc Argument count
      * @param argv List of arguments
      */
-    ArgParser(int argc, char* argv[]);
+    ArgParser(size_t argc, char* argv[]);
 
     /**
      * @brief Parses command line arguments
@@ -40,7 +40,7 @@ public:
     std::string getTargetAddress() const { return targetAddress; }
 
 private:
-    int argc;                   ///< Argument count
+    size_t argc;                   ///< Argument count
     char** argv;                ///< Arguments
     std::string filePath;       ///< Path to the file
     std::string targetAddress;  ///< Target IP or hostname

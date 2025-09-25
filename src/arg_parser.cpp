@@ -5,11 +5,11 @@
 #include "arg_parser.hpp"
 #include <iostream>
 
-ArgParser::ArgParser(int argc, char* argv[]) 
+ArgParser::ArgParser(size_t argc, char* argv[]) 
     : argc(argc), argv(argv), serverFlag(false) {}
 
 bool ArgParser::parse(void) {
-    for (int i = 1; i < argc; ++i) {
+    for (size_t i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "-r" && i + 1 < argc) {
             filePath = argv[++i];

@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 #include <stdexcept>
 
-namespace protocol { // 
+namespace protocol {
 
 std::vector<uint8_t> Metadata::serialize() const {
     std::vector<uint8_t> out;

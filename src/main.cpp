@@ -6,7 +6,7 @@
 #include "client.hpp"
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main(size_t argc, char* argv[]) {
     ArgParser argParser(argc, argv);
     
     if (!argParser.parse()) {
