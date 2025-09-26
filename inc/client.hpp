@@ -41,7 +41,7 @@ private:
     const std::string targetAddress;    ///< Target IP or hostname
     const std::string xlogin;           ///< Login for key derivation
     size_t maxChunkSize;                ///< Maximum chunk size
-    uint32_t nextSeqNum = 1;                ///< Sequence number for packet creation
+    uint32_t nextSeqNum = 0;                ///< Sequence number for packet creation
 
     /**
      * @brief Process file - read, encrypt, chunk and packet file

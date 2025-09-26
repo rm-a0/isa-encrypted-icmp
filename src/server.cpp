@@ -6,6 +6,7 @@
 #include "server.hpp"
 #include "net_utils.hpp"
 #include "protocol.hpp"
+#include "encoder.hpp"
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/icmp6.h>
@@ -25,23 +26,67 @@ Server::~Server() {
     }
 }
 
+void Server::processPackets(const protocol::Metadata& metadata,
+                            chunker::ByteVector2D&& chunks) 
+{
+    if (chunks.empty())
+        return;
+
+    std::vector<uint8_t> cipherData = chunker::reassembleData(chunks);
+    std::vector<uint8_t> key = encoder::deriveKey(xlogin);
+    std::vector<uint8_t> iv = metadata.iv;
+    std::vector<uint8_t> plain;
+
+    if (!encoder::decrypt(cipherData, key, iv, plain)) {
+        std::cout << "[SERVER] Decryption of the data failed" << std::endl;
+        return;
+    }
+
+    for (auto b : plain) {
+        std::cout << static_cast<char>(b);
+    }
+    std::cout << std::endl;
+}
+
 void Server::packetConsumerLoop(void) {
     while (running) {
         PacketPtr packet;
-        PacketVector localPackets;
 
         {
-           std::unique_lock<std::mutex> lock(queueMutex);
+            std::unique_lock<std::mutex> lock(queueMutex);
             queueCV.wait(lock, [this] { return !packetQueue.empty() || !running; });
 
-            if (!running && packetQueue.empty()) 
+            if (!running && packetQueue.empty())
                 break;
 
             packet = std::move(packetQueue.front());
-            packetQueue.pop(); 
+            packetQueue.pop();
         }
 
-        std::cout << packet->seqNum << std::endl;
+        uint32_t seq = packet->seqNum;
+        packets[seq] = std::move(packet);
+
+        if (packets[0] && packets[0]->packetType == protocol::PacketType::METADATA) {
+            const auto& metadata = std::get<protocol::Metadata>(packets[0]->payload);
+            totalChunks = metadata.totalChunks;
+        }
+
+        if (totalChunks > 0 && packets.size() == totalChunks + 1) {
+            const auto& metadata = std::get<protocol::Metadata>(packets[0]->payload);
+
+            chunker::ByteVector2D chunks;
+            chunks.reserve(totalChunks);
+
+            for (uint32_t i = 1; i <= totalChunks; ++i) {
+                const auto& data = std::get<protocol::Data>(packets[i]->payload);
+                chunks.push_back(data.payload);
+            }
+
+            processPackets(metadata, std::move(chunks));
+
+            packets.clear();
+            totalChunks = 0;
+        }
     }
 }
 
