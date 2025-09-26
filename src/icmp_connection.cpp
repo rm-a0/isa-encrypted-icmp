@@ -84,7 +84,7 @@ bool ICMPConnection::sendPacket(const uint8_t* payload, size_t payloadSize) {
             return false;
         }
     } else {
-        struct icmp6_hdr* icmp6 = (struct icmp6_hdr*)buffer;
+        struct icmp6_hdr* icmp6 = reinterpret_cast<struct icmp6_hdr*>(buffer);
         icmp6->icmp6_type = ICMP6_ECHO_REQUEST;
         icmp6->icmp6_code = 0;
         icmp6->icmp6_id = getpid() & 0xFFFF;

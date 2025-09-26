@@ -32,14 +32,16 @@ public:
     /**
      * @brief Encapsulates all private sub-processes
      * @return True if no issues, False if there was an error
+     * @return True if no issues, False if there was an error
      */
     bool run(void);
 
 private:
     const std::string filePath;         ///< Path to the file
     const std::string targetAddress;    ///< Target IP or hostname
-    const std::string xlogin;           ///< xlogin for key derivation
+    const std::string xlogin;           ///< Login for key derivation
     size_t maxChunkSize;                ///< Maximum chunk size
+    uint32_t nextSeqNum = 1;                ///< Sequence number for packet creation
 
     /**
      * @brief Process file - read, encrypt, chunk and packet file

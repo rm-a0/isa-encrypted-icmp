@@ -78,6 +78,7 @@ namespace protocol {
         uint32_t magicNum = 0xDEADBEEF;         ///< https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_debug_values
         uint8_t version = 1;                    ///< Protocol version
         PacketType packetType;                  ///< Type of the packet
+        uint32_t seqNum;                         ///< Sequence number of the packet
         std::variant<Metadata, Data> payload;   ///< Custom packet payload (variant instad of unions)
     };
 
@@ -86,16 +87,18 @@ namespace protocol {
     /**
      * @brief Builds custom Packet
      * @param data Metadata for building packet
-     * @return Custom Packet
+     * @param seqNum Sequence Number of the packet
+     * @return Custom Packet containing metadata
      */
-    PacketPtr buildMetadataPacket(const Metadata& data);
+    PacketPtr buildMetadataPacket(const Metadata& data, uint32_t seqNum);
 
     /**
      * @brief Builds custom Packet
      * @param data Data for building packet
-     * @return Custom Packet
+     * @param seqNum Sequence Number of the packet
+     * @return Custom Packet containing data
      */
-    PacketPtr buildDataPacket(const Data& data);
+    PacketPtr buildDataPacket(const Data& data, uint32_t seqNum);
 
     /**
      * @brief Serializes any packet using their specific serialization method

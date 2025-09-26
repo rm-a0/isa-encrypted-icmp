@@ -16,6 +16,13 @@ namespace net_utils {
     constexpr int ERR = -1;
 
     /**
+     * @brief Get the length of the link-layer header
+     * @param dataLink datalink type
+     * @return Number of bytes in the link-layer header
+     */
+    int getLinkHeaderLen(int dataLink);
+
+    /**
      * @brief Checks if the stirng is IPv4 address
      * @param str Address
      * @return True or False

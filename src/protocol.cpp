@@ -72,16 +72,18 @@ Data Data::deserialize(const uint8_t* data, size_t len) {
     return d;
 }
 
-PacketPtr buildMetadataPacket(const Metadata& meta) {
+PacketPtr buildMetadataPacket(const Metadata& meta, uint32_t seqNum) {
     auto pkt = std::make_unique<Packet>();
     pkt->packetType = METADATA;
+    pkt->seqNum = seqNum;
     pkt->payload = meta;
     return pkt;
 }
 
-PacketPtr buildDataPacket(const Data& d) {
+PacketPtr buildDataPacket(const Data& d, uint32_t seqNum) {
     auto pkt = std::make_unique<Packet>();
     pkt->packetType = DATA;
+    pkt->seqNum = seqNum;
     pkt->payload = d;
     return pkt;
 }
@@ -90,10 +92,15 @@ std::vector<uint8_t> serializePacket(const Packet& pkt) {
     std::vector<uint8_t> out;
 
     uint32_t mn = htonl(pkt.magicNum);
-    out.insert(out.end(), reinterpret_cast<uint8_t*>(&mn), reinterpret_cast<uint8_t*>(&mn) + sizeof(mn));
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&mn), 
+               reinterpret_cast<uint8_t*>(&mn) + sizeof(mn));
 
     out.push_back(pkt.version);
     out.push_back(static_cast<uint8_t>(pkt.packetType));
+
+    uint32_t sn = htonl(pkt.seqNum);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&sn), 
+               reinterpret_cast<uint8_t*>(&sn) + sizeof(sn));
 
     std::vector<uint8_t> payload;
 
@@ -114,7 +121,8 @@ std::vector<uint8_t> serializePacket(const Packet& pkt) {
 }
 
 PacketPtr parsePacket(const uint8_t* data, size_t len) {
-    if (len < sizeof(uint32_t) + 2) return nullptr;
+    if (len < sizeof(uint32_t) + 2 + sizeof(uint32_t)) 
+        return nullptr;
 
     auto pkt = std::make_unique<Packet>();
     size_t offset = 0;
@@ -125,6 +133,10 @@ PacketPtr parsePacket(const uint8_t* data, size_t len) {
 
     pkt->version = data[offset++];
     pkt->packetType = static_cast<PacketType>(data[offset++]);
+    uint32_t seq;
+    std::memcpy(&seq, data + offset, sizeof(seq));
+    pkt->seqNum = ntohl(seq);
+    offset += sizeof(seq);
 
     size_t payloadLen = len - offset;
 

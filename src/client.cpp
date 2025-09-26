@@ -13,9 +13,9 @@ Client::Client(const std::string filePath,
                const std::string targetAddress,
                const std::string xlogin,
                size_t maxChunkSize)
-    : filePath(std::move(filePath)), 
-      targetAddress(std::move(targetAddress)), 
-      xlogin(std::move(xlogin)), 
+    : filePath(std::move(filePath)),
+      targetAddress(std::move(targetAddress)),
+      xlogin(std::move(xlogin)),
       maxChunkSize(maxChunkSize) {}
 
 bool Client::packageFile(Client::PacketVector& packets) {
@@ -45,7 +45,7 @@ bool Client::packageFile(Client::PacketVector& packets) {
     meta.totalChunks = static_cast<uint32_t>(chunks.size());
     meta.iv = iv;
 
-    auto metaPacket = protocol::buildMetadataPacket(meta);
+    auto metaPacket = protocol::buildMetadataPacket(meta, nextSeqNum++);
     packets.push_back(std::move(metaPacket));
 
     for (size_t i = 0; i < chunks.size(); ++i) {
@@ -53,7 +53,7 @@ bool Client::packageFile(Client::PacketVector& packets) {
         data.chunkNum = static_cast<uint32_t>(i);
         data.payload = std::move(chunks[i]);
 
-        auto packet = protocol::buildDataPacket(data);
+        auto packet = protocol::buildDataPacket(data, nextSeqNum++);
         packets.push_back(std::move(packet));
     }
 

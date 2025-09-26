@@ -4,6 +4,7 @@
  */
 #include "arg_parser.hpp"
 #include "client.hpp"
+#include "server.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[]) {
@@ -14,8 +15,10 @@ int main(int argc, char* argv[]) {
     }
 
     if (argParser.isServer()) {
-        // Server server();
-        // server.run()
+        Server server("xrepcim00");
+        if(!server.run()) {
+            return 1;
+        }
     }
     else {
         Client client(argParser.getFilePath(), argParser.getTargetAddress());

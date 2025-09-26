@@ -1,0 +1,126 @@
+/**
+ * @file server.cpp
+ * @author Michal Repcik (xrepcim00)
+ * @note Most of the thread releated code was inspired by ChatGPT to meet modern C++ standards and ensure thread safety
+ */
+#include "server.hpp"
+#include "net_utils.hpp"
+#include "protocol.hpp"
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netinet/icmp6.h>
+#include <netinet/ip_icmp.h>
+#include <arpa/inet.h>
+#include <pcap.h>
+#include <iostream>
+
+Server::Server(const std::string xlogin)
+    : xlogin(std::move(xlogin)) {}
+
+Server::~Server() {
+    running = false;
+    queueCV.notify_all();
+    if (consumerThread.joinable()) {
+        consumerThread.join();
+    }
+}
+
+void Server::packetConsumerLoop(void) {
+    while (running) {
+        PacketPtr packet;
+        PacketVector localPackets;
+
+        {
+           std::unique_lock<std::mutex> lock(queueMutex);
+            queueCV.wait(lock, [this] { return !packetQueue.empty() || !running; });
+
+            if (!running && packetQueue.empty()) 
+                break;
+
+            packet = std::move(packetQueue.front());
+            packetQueue.pop(); 
+        }
+
+        std::cout << packet->seqNum << std::endl;
+    }
+}
+
+void Server::packetCaptureLoop(u_char* user, const struct pcap_pkthdr* header, const u_char* packet) {
+    auto* ctx = reinterpret_cast<PacketLoopContext*>(user);
+    int headerLen = ctx->headerLen;
+    Server* self = ctx->server;
+
+    const u_char* ipHeader = packet + headerLen;
+    uint8_t version = (*ipHeader) >> 4;
+
+
+    const u_char* icmpHeader = ipHeader;
+    const uint8_t* payload = nullptr;
+    size_t ipHeaderLen = 0;
+    size_t payloadLen = 0;
+    if (version == 4) {
+        const auto* iph = reinterpret_cast<const struct ip*>(ipHeader);
+        ipHeaderLen = iph->ip_hl * 4;
+        icmpHeader += ipHeaderLen;
+        payloadLen = ntohs(iph->ip_len) - ipHeaderLen - sizeof(struct icmphdr);
+        payload = reinterpret_cast<const uint8_t*>(icmpHeader + sizeof(struct icmphdr));
+    } 
+    else if (version == 6) {
+        ipHeaderLen = sizeof(struct ip6_hdr);
+        icmpHeader += ipHeaderLen;
+        payloadLen = ntohs(reinterpret_cast<const struct ip6_hdr*>(ipHeader)->ip6_plen) - sizeof(struct icmp6_hdr);
+        payload = reinterpret_cast<const uint8_t*>(icmpHeader + sizeof(struct icmp6_hdr));
+    }
+
+    protocol::PacketPtr packetPtr = protocol::parsePacket(payload, payloadLen);
+
+    {
+        std::lock_guard<std::mutex> lock(self->queueMutex);
+        self->packetQueue.push(std::move(packetPtr));
+    }
+    self->queueCV.notify_one();
+}
+
+bool Server::startPacketCapture(void) {
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_t *handle = pcap_open_live("any", 1500, 0, 100, errbuf);
+    if (handle == nullptr) {
+        std::cerr << "[SERVER] pcap_open_live failed: " << errbuf << std::endl;
+        return false;
+    }
+    
+    struct bpf_program fp;
+    char filter_exp[] = "icmp or icmp6";
+    if (pcap_compile(handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1) {
+        std::cerr << "[SERVER] pcap_compiler failed: " << pcap_geterr(handle) << std::endl;
+        pcap_close(handle);
+        return false;
+    }
+
+    if (pcap_setfilter(handle, &fp) == -1) {
+        std::cerr << "[SERVER] pcap_setfilter failed: " << pcap_geterr(handle) << std::endl;
+        pcap_close(handle);
+        return false;
+    }
+    
+    int datalink = pcap_datalink(handle);
+    int headerLen = net_utils::getLinkHeaderLen(datalink);
+    if (headerLen < 0) {
+        pcap_close(handle);
+        return false;
+    }
+
+    PacketLoopContext ctx{headerLen, this};
+    pcap_loop(handle, -1, packetCaptureLoop, reinterpret_cast<u_char*>(&ctx));
+    
+    pcap_close(handle);
+    return true;
+}
+
+bool Server::run(void) {
+    running = true;
+
+    consumerThread = std::thread(&Server::packetConsumerLoop, this);
+
+    return startPacketCapture();
+}

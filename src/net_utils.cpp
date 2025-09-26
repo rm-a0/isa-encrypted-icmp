@@ -13,6 +13,18 @@
 #include <ifaddrs.h>
 #include <iostream>
 #include <vector>
+#include <pcap/dlt.h>
+
+int net_utils::getLinkHeaderLen(int dataLink) {
+    switch (dataLink) {
+        case DLT_EN10MB:    return 14;
+        case DLT_LINUX_SLL: return 16;
+        case DLT_NULL:      return 4;
+        case DLT_RAW:       return 0;
+        default:
+            return -1;
+    }
+}
 
 bool net_utils::isIPv4(const std::string& str) {
     struct sockaddr_in sa;
