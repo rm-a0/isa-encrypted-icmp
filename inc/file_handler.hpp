@@ -25,6 +25,13 @@ namespace file_handler {
      * @return True if no issues, False if error occurred
      */
     bool writeFile(const std::string& name, const std::vector<uint8_t>& data);
+
+    /**
+     * @brief Extracts file name from the path
+     * @param path Path to the file
+     * @return Name of the file
+     */
+    std::string getNameFromPath(const std::string& path);
 }
 
 #endif // FILE_HANDLER_HPP

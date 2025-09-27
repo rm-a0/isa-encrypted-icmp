@@ -1,3 +1,4 @@
 .vscode/
 build/
 *.secret
+test_env/

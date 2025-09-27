@@ -48,7 +48,7 @@ bool Client::packageFile(Client::PacketVector& packets) {
     auto chunks = chunker::chunkData(cipherData, maxChunkSize);
 
     protocol::Metadata meta;
-    meta.fileName = filePath;
+    meta.fileName = file_handler::getNameFromPath(filePath);
     meta.fileSize = static_cast<uint32_t>(cipherData.size());
     meta.totalChunks = static_cast<uint32_t>(chunks.size());
     meta.iv = iv;
@@ -88,18 +88,6 @@ bool Client::run(void) {
             std::cerr << "[CLIENT] Failed to package file into packets" << std::endl;
             return false;
         }
-
-        // DEBUG
-        int cnt = 0;
-        for (auto& packet : packets) {
-            cnt++;
-            std::cout << "[DEBUG] Packet info" << std::endl
-                      << "        MagicNum: " << std::hex << packet->magicNum << std::endl
-                      << "        Type    : " << (int)packet->packetType << std::endl
-                      << "        Version : " << static_cast<int>(packet->version) << std::endl;
-        }
-        std::cout << "cnt: " << cnt << std::endl;
-        // DEBUG
 
         ICMPConnection icmpConnection(targetAddress);
         if (!icmpConnection.connect()) {

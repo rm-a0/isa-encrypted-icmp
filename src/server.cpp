@@ -7,6 +7,7 @@
 #include "net_utils.hpp"
 #include "protocol.hpp"
 #include "encoder.hpp"
+#include "file_handler.hpp"
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/icmp6.h>
@@ -41,10 +42,10 @@ void Server::processPackets(const protocol::Metadata& metadata,
         return;
     }
 
-    for (auto b : plain) {
-        std::cout << static_cast<char>(b);
+    if (!file_handler::writeFile(metadata.fileName, plain)) {
+        std::cout << "[SERVER] Could not save data to the file" << std::endl;
+        return;
     }
-    std::cout << std::endl;
 }
 
 void Server::updateClientMetadata(uint64_t clientId) {
