@@ -98,7 +98,6 @@ bool Client::run(void) {
             std::cerr << "[CLIENT] Failed to transmit packets" << std::endl;
             return false;
         }
-
         return true;
     } catch (const std::invalid_argument& e) {
         std::cerr << "[CLIENT] Invalid input: " << e.what() << std::endl;

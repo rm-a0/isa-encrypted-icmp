@@ -24,7 +24,7 @@ $(BUILDDIR):
 run: $(TARGET)
 	./$(TARGET)
 zip:
-	zip -r xrepcim00.zip . -x ".*" "build/*" "secret"
+	zip -r xrepcim00.zip . -x ".*" "build/*" "test/*" "secret" "test_env/*"
 
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)

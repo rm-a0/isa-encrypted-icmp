@@ -29,7 +29,7 @@ public:
     Client(const std::string filePath, 
            const std::string targetAddress,
            const std::string xlogin = "xrepcim00", 
-           size_t maxChunkSize = 1400);
+           size_t maxChunkSize = 1440);
 
     /**
      * @brief Encapsulates all private sub-processes

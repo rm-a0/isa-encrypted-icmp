@@ -2,3 +2,4 @@
 build/
 *.secret
 test_env/
+test/end-of-evangelion.mp4
