@@ -72,18 +72,20 @@ Data Data::deserialize(const uint8_t* data, size_t len) {
     return d;
 }
 
-PacketPtr buildMetadataPacket(const Metadata& meta, uint32_t seqNum) {
+PacketPtr buildMetadataPacket(const Metadata& meta, uint32_t seqNum, uint64_t clientId) {
     auto pkt = std::make_unique<Packet>();
     pkt->packetType = METADATA;
     pkt->seqNum = seqNum;
+    pkt->id = clientId;
     pkt->payload = meta;
     return pkt;
 }
 
-PacketPtr buildDataPacket(const Data& d, uint32_t seqNum) {
+PacketPtr buildDataPacket(const Data& d, uint32_t seqNum, uint64_t clientId) {
     auto pkt = std::make_unique<Packet>();
     pkt->packetType = DATA;
     pkt->seqNum = seqNum;
+    pkt->id = clientId;
     pkt->payload = d;
     return pkt;
 }
@@ -102,8 +104,11 @@ std::vector<uint8_t> serializePacket(const Packet& pkt) {
     out.insert(out.end(), reinterpret_cast<uint8_t*>(&sn), 
                reinterpret_cast<uint8_t*>(&sn) + sizeof(sn));
 
-    std::vector<uint8_t> payload;
+    uint64_t netId = htobe64(pkt.id);
+    out.insert(out.end(), reinterpret_cast<uint8_t*>(&netId),
+               reinterpret_cast<uint8_t*>(&netId) + sizeof(netId));
 
+    std::vector<uint8_t> payload;
     if (pkt.packetType == METADATA) {
         const Metadata& meta = std::get<Metadata>(pkt.payload);
         payload = meta.serialize();
@@ -121,7 +126,7 @@ std::vector<uint8_t> serializePacket(const Packet& pkt) {
 }
 
 PacketPtr parsePacket(const uint8_t* data, size_t len) {
-    if (len < sizeof(uint32_t) + 2 + sizeof(uint32_t)) 
+    if (len < sizeof(uint32_t) + 2 + sizeof(uint32_t) + sizeof(uint64_t)) 
         return nullptr;
 
     auto pkt = std::make_unique<Packet>();
@@ -133,10 +138,16 @@ PacketPtr parsePacket(const uint8_t* data, size_t len) {
 
     pkt->version = data[offset++];
     pkt->packetType = static_cast<PacketType>(data[offset++]);
+
     uint32_t seq;
     std::memcpy(&seq, data + offset, sizeof(seq));
     pkt->seqNum = ntohl(seq);
     offset += sizeof(seq);
+
+    uint64_t rawId;
+    std::memcpy(&rawId, data + offset, sizeof(rawId));
+    pkt->id = be64toh(rawId);
+    offset += sizeof(rawId);
 
     size_t payloadLen = len - offset;
 

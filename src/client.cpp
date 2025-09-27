@@ -16,7 +16,15 @@ Client::Client(const std::string filePath,
     : filePath(std::move(filePath)),
       targetAddress(std::move(targetAddress)),
       xlogin(std::move(xlogin)),
-      maxChunkSize(maxChunkSize) {}
+      maxChunkSize(maxChunkSize) 
+      { id = generateId(); }
+
+uint64_t Client::generateId(void) {
+        std::random_device rd;
+        std::mt19937_64 gen(rd());
+        std::uniform_int_distribution<uint64_t> dist;
+        return dist(gen);
+}
 
 bool Client::packageFile(Client::PacketVector& packets) {
     std::vector<uint8_t> data;
@@ -45,7 +53,7 @@ bool Client::packageFile(Client::PacketVector& packets) {
     meta.totalChunks = static_cast<uint32_t>(chunks.size());
     meta.iv = iv;
 
-    auto metaPacket = protocol::buildMetadataPacket(meta, nextSeqNum++);
+    auto metaPacket = protocol::buildMetadataPacket(meta, nextSeqNum++, id);
     packets.push_back(std::move(metaPacket));
 
     for (size_t i = 0; i < chunks.size(); ++i) {
@@ -53,7 +61,7 @@ bool Client::packageFile(Client::PacketVector& packets) {
         data.chunkNum = static_cast<uint32_t>(i);
         data.payload = std::move(chunks[i]);
 
-        auto packet = protocol::buildDataPacket(data, nextSeqNum++);
+        auto packet = protocol::buildDataPacket(data, nextSeqNum++, id);
         packets.push_back(std::move(packet));
     }
 

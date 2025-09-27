@@ -43,9 +43,11 @@ private:
     std::mutex queueMutex;                  ///< Mutex used for appending/popping packets
     std::condition_variable queueCV;        ///< Condition for waiting for the thread
     std::thread consumerThread;             ///< Thread for consuming/processing packets
-    std::map<uint32_t, PacketPtr> packets;  ///< Packets ordered by their sequence number
-    uint32_t totalChunks;
     bool running = false;                   ///< Flag for server state
+    ///< Packet map ordered by client ID and seqNum
+    std::map<uint64_t, std::map<uint32_t, PacketPtr>> clientPackets;
+    ///< Map for tracking client ID and per-client chunks
+    std::map<uint64_t, uint32_t> clientTotalChunks;                     
 
     struct PacketLoopContext {
         int headerLen;
@@ -64,6 +66,10 @@ private:
 
     void processPackets(const protocol::Metadata& metadata,
                         chunker::ByteVector2D&& chunks);
+
+    void updateClientMetadata(uint64_t clientId);
+
+    void tryReassemble(uint64_t clientId);
 };
 
 #endif // SERVER_HPP

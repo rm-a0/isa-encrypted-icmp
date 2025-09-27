@@ -27,8 +27,7 @@ Server::~Server() {
 }
 
 void Server::processPackets(const protocol::Metadata& metadata,
-                            chunker::ByteVector2D&& chunks) 
-{
+                            chunker::ByteVector2D&& chunks) {
     if (chunks.empty())
         return;
 
@@ -48,6 +47,57 @@ void Server::processPackets(const protocol::Metadata& metadata,
     std::cout << std::endl;
 }
 
+void Server::updateClientMetadata(uint64_t clientId) {
+    auto itMeta = clientPackets[clientId].find(0);
+    if (itMeta != clientPackets[clientId].end() && itMeta->second) {
+        if (auto metadata = std::get_if<protocol::Metadata>(&itMeta->second->payload)) {
+            clientTotalChunks[clientId] = metadata->totalChunks;
+        }
+    }
+}
+
+void Server::tryReassemble(uint64_t clientId) {
+    auto itTotal = clientTotalChunks.find(clientId);
+    if (itTotal == clientTotalChunks.end())
+        return;
+
+    uint32_t totalChunks = itTotal->second;
+    if (totalChunks == 0)
+        return;
+
+    if (clientPackets[clientId].size() < totalChunks + 1)
+        return;
+
+    chunker::ByteVector2D chunks;
+    chunks.reserve(totalChunks);
+
+    for (uint32_t i = 1; i <= totalChunks; ++i) {
+        auto it = clientPackets[clientId].find(i);
+        if (it == clientPackets[clientId].end() || !it->second) {
+            std::cerr << "[SERVER] Missing packet client" << std::endl;
+            return;
+        }
+
+        if (auto data = std::get_if<protocol::Data>(&it->second->payload)) {
+            chunks.push_back(data->payload);
+        } 
+        else {
+            std::cerr << "[SERVER] Unexpected packet type" << std::endl;
+            return;
+        }
+    }
+
+    auto itMeta = clientPackets[clientId].find(0);
+    if (itMeta != clientPackets[clientId].end()) {
+        if (auto metadata = std::get_if<protocol::Metadata>(&itMeta->second->payload)) {
+            processPackets(*metadata, std::move(chunks));
+        }
+    }
+
+    clientPackets.erase(clientId);
+    clientTotalChunks.erase(clientId);
+}
+
 void Server::packetConsumerLoop(void) {
     while (running) {
         PacketPtr packet;
@@ -63,30 +113,14 @@ void Server::packetConsumerLoop(void) {
             packetQueue.pop();
         }
 
+        uint64_t clientId = packet->id;
         uint32_t seq = packet->seqNum;
-        packets[seq] = std::move(packet);
 
-        if (packets[0] && packets[0]->packetType == protocol::PacketType::METADATA) {
-            const auto& metadata = std::get<protocol::Metadata>(packets[0]->payload);
-            totalChunks = metadata.totalChunks;
-        }
+        clientPackets[clientId][seq] = std::move(packet);
 
-        if (totalChunks > 0 && packets.size() == totalChunks + 1) {
-            const auto& metadata = std::get<protocol::Metadata>(packets[0]->payload);
+        updateClientMetadata(clientId);
 
-            chunker::ByteVector2D chunks;
-            chunks.reserve(totalChunks);
-
-            for (uint32_t i = 1; i <= totalChunks; ++i) {
-                const auto& data = std::get<protocol::Data>(packets[i]->payload);
-                chunks.push_back(data.payload);
-            }
-
-            processPackets(metadata, std::move(chunks));
-
-            packets.clear();
-            totalChunks = 0;
-        }
+        tryReassemble(clientId);
     }
 }
 

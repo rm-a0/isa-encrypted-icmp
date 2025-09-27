@@ -7,6 +7,8 @@
 
 #include <string>
 #include <protocol.hpp>
+#include <chrono>
+#include <random>
 #include "icmp_connection.hpp"
 
 /**
@@ -41,7 +43,8 @@ private:
     const std::string targetAddress;    ///< Target IP or hostname
     const std::string xlogin;           ///< Login for key derivation
     size_t maxChunkSize;                ///< Maximum chunk size
-    uint32_t nextSeqNum = 0;                ///< Sequence number for packet creation
+    uint32_t nextSeqNum = 0;            ///< Sequence number for packet creation
+    uint64_t id = 0;
 
     /**
      * @brief Process file - read, encrypt, chunk and packet file
@@ -58,6 +61,12 @@ private:
      * @return True if no issues, False if there was an error
      */
     bool transmitPackets(PacketVector& packets, ICMPConnection& connection);
+
+    /**
+     * @brief Generates random number for client
+     * @return Random client ID
+     */
+    uint64_t generateId(void);
 };
 
 #endif // CLIENT_HPP
