@@ -77,7 +77,6 @@ bool Client::transmitPackets(PacketVector& packets, ICMPConnection& connection) 
         }
     }
 
-    std::cout << "all packets sent successfully" << std::endl;
     return true;
 }
 
