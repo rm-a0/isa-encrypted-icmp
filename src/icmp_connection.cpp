@@ -17,6 +17,7 @@ ICMPConnection::ICMPConnection(const std::string& targetAddress)
     : targetAddress(targetAddress), sockfd(-1), isIPv4(false) {
     memset(&addr4, 0, sizeof(addr4));
     memset(&addr6, 0, sizeof(addr6));
+    memset(&srcAddr6, 0, sizeof(srcAddr6));
 }
 
 ICMPConnection::~ICMPConnection() {
@@ -27,7 +28,7 @@ ICMPConnection::~ICMPConnection() {
 }
 
 bool ICMPConnection::connect(void) {
-    int result = net_utils::resolveAddress(targetAddress, addr4, addr6) == net_utils::ERR;
+    int result = net_utils::resolveAddress(targetAddress, addr4, addr6);
     if (result == net_utils::ERR) {
         std::cerr << "[ICMP_CONNECTION] Could not resolve target address" << std::endl;
         return false;
@@ -43,6 +44,11 @@ bool ICMPConnection::connect(void) {
         isIPv4 = false;
         protocol = static_cast<int>(IPPROTO_ICMPV6);
         domain = static_cast<int>(AF_INET6);
+
+        if (!net_utils::getSourceIPv6Address(srcAddr6)) {
+            std::cerr << "[ICMP_CONNECTION] Failed to get source IPv6 address" << std::endl;
+            return false;
+        }
     }
 
     sockfd = socket(domain, SOCK_RAW, protocol);
@@ -93,6 +99,8 @@ bool ICMPConnection::sendPacket(const uint8_t* payload, size_t payloadSize) {
 
         memcpy(buffer + sizeof(*icmp6), payload, payloadSize);
         packetSize = sizeof(*icmp6) + payloadSize;
+
+        icmp6->icmp6_cksum = net_utils::computeIPv6Checksum(reinterpret_cast<uint8_t*>(buffer), packetSize, srcAddr6, addr6);
 
         ssize_t sent = sendto(sockfd, buffer, packetSize, 0, reinterpret_cast<struct sockaddr*>(&addr6), sizeof(addr6));
         if (sent < 0) {

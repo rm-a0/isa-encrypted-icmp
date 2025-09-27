@@ -16,6 +16,12 @@ namespace net_utils {
     constexpr int ERR = -1;
 
     /**
+     * @brief Get the source IPv6 address
+     * @param srcAddr IPv6 address
+     * @return True if no issues occurred, false otherwise.
+     */
+    bool getSourceIPv6Address(struct sockaddr_in6& srcAddr);
+    /**
      * @brief Get the length of the link-layer header
      * @param dataLink datalink type
      * @return Number of bytes in the link-layer header

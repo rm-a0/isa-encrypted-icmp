@@ -57,6 +57,8 @@ private:
     bool isIPv4;                        ///< Protocol type
     struct sockaddr_in addr4;           ///< IPv4 address
     struct sockaddr_in6 addr6;          ///< IPv6 address
+    struct sockaddr_in6 srcAddr6;       ///< Source IPv6 address (for checksum)
+
 };
 
 #endif // ICMP_CONNECTION_HPP

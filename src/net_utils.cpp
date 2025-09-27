@@ -135,3 +135,29 @@ uint16_t net_utils::computeIPv6Checksum(const uint8_t* data, size_t length,
 
     return net_utils::computeIPv4Checksum(buf.data(), buf.size());
 }
+
+bool net_utils::getSourceIPv6Address(struct sockaddr_in6& srcAddr) {
+    struct ifaddrs *ifaddr, *ifa;
+    if (getifaddrs(&ifaddr) == -1) {
+        return false;
+    }
+
+    bool found = false;
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == nullptr) continue;
+        if (ifa->ifa_addr->sa_family == AF_INET6) {
+            struct sockaddr_in6 *addr = reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr);
+            if (!IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
+                memcpy(&srcAddr, addr, sizeof(srcAddr));
+                found = true;
+                break;
+            }
+        }
+    }
+
+    freeifaddrs(ifaddr);
+    if (!found) {
+        return false;
+    }
+    return true;
+}
