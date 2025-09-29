@@ -1,5 +1,5 @@
 .vscode/
 build/
-*.secret
+*secret
 test_env/
 test/end-of-evangelion.mp4

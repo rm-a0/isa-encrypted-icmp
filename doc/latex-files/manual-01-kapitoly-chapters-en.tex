@@ -1,0 +1,29 @@
+% This file should be replaced with your file with thesis content.
+%=========================================================================
+% Authors: Michal Bidlo, Bohuslav Křena, Jaroslav Dytrych, Petr Veigend and Adam Herout 2019
+
+% For compilation piecewise (see projekt.tex), it is necessary to uncomment it and change
+% \documentclass[../projekt.tex]{subfiles}
+% \begin{document}
+
+\chapter{Overview}
+
+This documentation describes a client/server application that transfers files covertly using ICMP/ICMPv6 Echo-Request/Response packets. The app encrypts files with AES (using the user’s login as the key) to keep data secure and splits large files into chunks to fit within standard network packet sizes (1500 bytes). The client sends the encrypted file to a specified IP or hostname, while the server listens for ICMP packets, decrypts them, and saves the file locally. A custom protocol ensures reliable transfer, including sending the filename and verifying the file is complete. The app is built in C++ using standard libraries, OpenSSL for encryption, and libpcap for packet handling, tested on GNU/Linux (merlin.fit.vutbr.cz).
+
+\chapter{Design}
+
+The application is designed to address the need for secure, covert file transfer via ICMP/ICMPv6. Existing tools like \texttt{pingtunnel} lack encryption or robust file transfer protocols, so this app adds AES encryption and a custom protocol for reliability.
+
+Key design features:
+\begin{itemize}
+    \item \textbf{Encryption}: AES-256-CBC encrypts files using the user’s login as the key.
+    \item \textbf{Fragmentation}: Files larger than 1400 bytes (to fit ICMP payloads) are split into chunks.
+    \item \textbf{Protocol}: Includes a header with filename (up to 255 bytes), file size, sequence number, and CRC32 checksum for integrity.
+    \item \textbf{Operation Modes}: Client mode (\texttt{-r <file> -s <ip|hostname>}) sends files; server mode (\texttt{-l}) listens and saves files.
+\end{itemize}
+
+The app uses raw sockets for sending ICMP packets and libpcap for capturing them, supporting both IPv4 and IPv6. It’s built to be portable, using only allowed libraries (e.g., \texttt{netinet/*}, OpenSSL, libpcap).
+%=========================================================================
+
+% For compilation piecewise (see projekt.tex), it is necessary to uncomment it
+% \end{document}
