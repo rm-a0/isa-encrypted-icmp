@@ -8,21 +8,224 @@
 
 \chapter{Overview}
 
-This documentation describes a client/server application that transfers files covertly using ICMP/ICMPv6 Echo-Request/Response packets. The app encrypts files with AES (using the user’s login as the key) to keep data secure and splits large files into chunks to fit within standard network packet sizes (1500 bytes). The client sends the encrypted file to a specified IP or hostname, while the server listens for ICMP packets, decrypts them, and saves the file locally. A custom protocol ensures reliable transfer, including sending the filename and verifying the file is complete. The app is built in C++ using standard libraries, OpenSSL for encryption, and libpcap for packet handling, tested on GNU/Linux (merlin.fit.vutbr.cz).
+This documentation describes a client/server application that 
+transfers encrypted files using ICMP/ICMPv6 Echo-Request/Response packets. 
 
-\chapter{Design}
-
-The application is designed to address the need for secure, covert file transfer via ICMP/ICMPv6. Existing tools like \texttt{pingtunnel} lack encryption or robust file transfer protocols, so this app adds AES encryption and a custom protocol for reliability.
-
-Key design features:
+\section*{Features}
 \begin{itemize}
-    \item \textbf{Encryption}: AES-256-CBC encrypts files using the user’s login as the key.
-    \item \textbf{Fragmentation}: Files larger than 1400 bytes (to fit ICMP payloads) are split into chunks.
-    \item \textbf{Protocol}: Includes a header with filename (up to 255 bytes), file size, sequence number, and CRC32 checksum for integrity.
-    \item \textbf{Operation Modes}: Client mode (\texttt{-r <file> -s <ip|hostname>}) sends files; server mode (\texttt{-l}) listens and saves files.
+  \item AES encryption (key derived from the user’s login).
+  \item File chunking to fit within the standard MTU (1500 bytes).
+  \item Reliable transfer ensured by a custom protocol.
+  \item Support for both IPv4 and IPv6.
+  \item Implemented in C++ with OpenSSL and libpcap \cite{libpcap}.
 \end{itemize}
 
-The app uses raw sockets for sending ICMP packets and libpcap for capturing them, supporting both IPv4 and IPv6. It’s built to be portable, using only allowed libraries (e.g., \texttt{netinet/*}, OpenSSL, libpcap).
+\section*{System Requirements}
+\begin{itemize}
+  \item GNU/Linux environment (tested on Debian and WSL2 with GCC 12.5.0 and GNU Make 4.3).
+  \item Root privileges (required for raw packet capture and injection).
+  \item OpenSSL and libpcap libraries installed.
+  \item C++17 or higher (uses \texttt{std::variant} and \texttt{std::filesystem}).
+  \item \texttt{GNU Make} 3.8 or higher (required for advanced wildcards and pattern rules in the default Makefile).
+\end{itemize}
+
+\chapter{Usage}
+
+This chapter explains how to build and run the application, 
+including installation requirements, client commands, server commands, 
+and usage examples.
+
+\section{Installation}
+\begin{enumerate}
+  \item Download the project or clone the git repository:
+\begin{verbatim}
+git clone https://github.com/rm-a0/isa-encrypted-icmp
+cd isa-encrypted-icmp
+\end{verbatim}
+
+  \item Ensure all dependencies are installed:
+    \begin{itemize}
+      \item C++17 or higher (compiler support for \texttt{std::variant} and \texttt{std::filesystem}).
+      \item OpenSSL development libraries.
+      \item libpcap development libraries.
+      \item \texttt{GNU Make} \textbf{3.8 or higher} (required for advanced wildcards and pattern rules in the default Makefile).
+    \end{itemize}
+
+  \item Build the project (run from the project root):
+\begin{verbatim}
+make
+\end{verbatim}
+
+  \item The executable \texttt{secret} will be available in the project root directory after a successful build.
+\end{enumerate}
+
+\newpage
+
+\section{Exectuion}
+
+\subsection*{Syntax}
+\begin{verbatim}
+secret -r <file> -s <ip|hostname> [-l]
+\end{verbatim}
+
+\subsection*{Parameter Description}
+\begin{itemize}
+  \item \texttt{-r <file>} : specify the file to transfer; can be relative or absolute path (e.g., \texttt{-r ../test.file}).
+  \item \texttt{-s <ip|hostname>} : IP address or hostname of the target machine to which the file will be sent.
+  \item \texttt{-l} : if this flag is set, the program runs in \emph{server} mode (listen) — the program listens 
+on the network, receives incoming ICMP packets, reconstructs and decrypts the file.
+\end{itemize}
+
+\subsection*{Notes}
+\begin{itemize}
+  \item Raw packet operations require superuser privileges — run the program with \texttt{sudo} 
+   (e.g., \texttt{sudo ./secret ...}).
+  \item The \texttt{-s} parameter accepts both IPv4 and IPv6 addresses as well as hostnames; 
+  the program automatically switches to ICMPv6 when using an IPv6 address.
+  \item File paths can be relative or absolute; relative paths are resolved from the current working directory.
+  \item If a file with the same name already exists on the server, it will be overwritten. 
+\end{itemize}
+
+\subsection*{Examples}
+\paragraph{Starting the server (listening mode)}
+\begin{verbatim}
+# run the application as a server
+sudo ./secret -l
+\end{verbatim}
+
+\paragraph{Sending a file (client mode)}
+\begin{verbatim}
+# send test.txt to the machine at 192.168.1.10
+sudo ./secret -r test.txt -s 192.168.1.10
+
+# send a binary file to a hostname
+sudo ./secret -r ../video.mp4 -s server.example.com
+\end{verbatim}
+
+\chapter{Implementation Details}
+
+This chapter provides an in-depth look at the implementation of the \texttt{secret} 
+application, including its code structure, key classes and namespaces, custom protocol, 
+error handling, and design choices.
+
+\section{Code Structure}
+
+The application is implemented in C++17 and organized into modular source files, each 
+handling a specific aspect of functionality. The code adheres to good practices with 
+consistent formatting, meaningful variable names, and doxygen style comments in each header file. 
+The source files are:
+
+\begin{itemize}
+  \item \verb|main.cpp|: Entry point, parses arguments, and initializes client or server mode.
+  \item \verb|arg_parser.cpp|: Handles command-line argument parsing and validation.
+  \item \verb|file_handler.cpp|: Manages file reading, writing, and path processing.
+  \item \verb|encoder.cpp|: Implements AES-256-CBC encryption and decryption using OpenSSL \cite{openssl}.
+  \item \verb|chunker.cpp|: Splits files into chunks and reassembles them.
+  \item \verb|protocol.cpp|: Defines the custom protocol for packet structure and serialization.
+  \item \verb|icmp_connection.cpp|: Manages ICMP/ICMPv6 socket creation and packet sending \cite{manip, manipv6}.
+  \item \verb|net_utils.cpp|: Provides utility functions for address resolution and checksum calculation \cite{beejnet, ipkl4scanner, manipv6, manip}.
+  \item \verb|client.cpp|: Implements client logic for file encryption, chunking, and transmission.
+  \item \verb|server.cpp|: Implements server logic for packet capture, processing, and file reconstruction \cite{libpcap}.
+\end{itemize}
+
+\section{Custom Protocol}
+
+The application uses a custom protocol to ensure reliable file transfer over ICMP/ICMPv6 \cite{rfc792, rfc4443}. 
+The protocol defines two packet types: \texttt{METADATA} and \texttt{DATA}, encapsulated within 
+ICMP Echo Request/Reply packets.
+
+\subsection*{Packet Structure}
+Each packet has the following fields:
+\begin{itemize}
+  \item \textbf{Magic Number} (4 bytes): A fixed value (\verb|0xDEADBEEF|) to identify valid packets.
+  \item \textbf{Version} (1 byte): Protocol version, set to 1.
+  \item \textbf{Packet Type} (1 byte): \texttt{0} for \texttt{METADATA}, \texttt{1} for \texttt{DATA}.
+  \item \textbf{Sequence Number} (4 bytes): Ensures correct packet ordering, starting at 0 for \texttt{METADATA} and incrementing for each \texttt{DATA} packet.
+  \item \textbf{Client ID} (8 bytes): A randomly generated identifier to distinguish packets from different clients.
+  \item \textbf{Payload}: Either \texttt{Metadata} or \texttt{Data}, serialized as follows:
+    \begin{itemize}
+      \item \texttt{Metadata} contains: 
+      \begin{itemize}
+        \item Filename length (1 byte)
+        \item Filename (variable length)
+        \item File size (4 bytes) 
+        \item Total chunks (4 bytes)
+        \item AES initialization vector (16 bytes)
+      \end{itemize}
+      \item \texttt{Data} contains:
+      \begin{itemize}
+        \item Chunk number (4 bytes) 
+        \item Chunk payload (up to 1472 bytes).
+      \end{itemize} 
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Transfer Process}
+\begin{enumerate}
+  \item The client sends a \texttt{METADATA} packet with sequence number 0, containing the filename, encrypted file size, total number of chunks, and AES IV.
+  \item The client sends \texttt{DATA} packets with incrementing sequence numbers, each containing a chunk of the encrypted file.
+  \item The server captures packets using libpcap, filters for ICMP/ICMPv6, and stores them in a thread-safe queue.
+  \item A consumer thread processes packets, grouping them by client ID and sequence number. Once all chunks are received (verified using \texttt{totalChunks}), the server reassembles and decrypts the file.
+\end{enumerate}
+
+\subsection*{Reliability}
+The protocol assumes no packet loss, as specified in the task. 
+Sequence numbers ensure correct packet ordering, and the client ID 
+separates packets from multiple clients. Network byte order 
+(\texttt{htonl}, \texttt{ntohl}, \texttt{htobe64}, \texttt{be64toh}) is used for portability across architectures.
+
+\section{Design Choices and Assumptions}
+\begin{itemize}
+  \item \textbf{Hardcoded Login}: The encryption key is derived from the hardcoded login \verb|xrepcim00| using SHA-256, as the task specifies using the user’s login but does not require dynamic input.
+  \item \textbf{File Overwriting}: If a file with the same name exists on the server, it is overwritten to simplify implementation, as the task does not specify handling naming conflicts.
+  \item \textbf{Filename in Metadata}: The filename sent in the \texttt{METADATA} packet is the same as the name of the file being sent, extracted from the file path using \verb|file_handler::getNameFromPath|.
+  \item \textbf{Encryption Before Chunking}: The entire file is encrypted with AES-256-CBC using a single initialization vector (IV) before being split into chunks, ensuring consistent encryption across all chunks \cite{openssl}.
+  \item \textbf{No Packet Loss}: The protocol assumes no packet loss, omitting retransmission mechanisms, as allowed by the task.
+  \item \textbf{IPv4/IPv6 Detection}: \verb|net_utils| automatically detects IPv4 or IPv6 addresses using \verb|inet_pton| and \verb|getaddrinfo| for robust resolution \cite{manip, manipv6}.
+\end{itemize}
+
+\chapter{Additional Functionality and Limitations}
+
+\section{Multiple Client Support}
+The server uses a thread-safe design to process packets from multiple clients:
+\begin{itemize}
+  \item Each client generates a unique 64-bit \texttt{clientId} using \verb|std::mt19937_64|, included in every packet.
+  \item The server maintains a map (\texttt{clientPackets}) that groups packets by \texttt{clientId}, ensuring packets from different clients are processed independently.
+  \item A consumer thread, protected by a mutex and condition variable, processes packets from a queue, allowing concurrent packet capture and processing.
+  \item Once all chunks for a client (determined by \texttt{totalChunks} in the \texttt{METADATA} packet) are received, the server reassembles and decrypts the file, then clears the client’s data to free memory.
+\end{itemize}
+This design ensures scalability and prevents interference between concurrent file transfers.
+
+\section{Limitations}
+The application has the following limitations, particularly in real-world scenarios:
+\begin{itemize}
+  \item \textbf{Large File Transfers and Packet Loss}: The protocol assumes no packet loss, as specified by the task. In real-world scenarios where packet loss occurs, large file transfers may fail to complete, resulting in no file being created on the server, as the server requires all chunks (verified by \texttt{totalChunks}) to reconstruct the file.
+  \item \textbf{Memory Usage}: Since the entire file is encrypted and decrypted as a whole (using a single IV), the server must hold the reassembled encrypted file in memory before decryption. Additionally, the \texttt{clientPackets} map stores all packets for each client in memory until the transfer is complete. This can lead to significant memory usage, especially when multiple clients send large files concurrently, potentially exhausting the server’s RAM.
+  \item \textbf{Client ID Collisions}: Although the 64-bit \texttt{clientId} generated by \verb|std::mt19937_64| minimizes the risk, there is a theoretical possibility of two clients generating the same ID (due to the birthday paradox). This could cause packets from different clients to be misattributed, leading to corrupted or mixed file transfers. The large 64-bit space makes this unlikely but not impossible.
+\end{itemize}
+
+\chapter{Testing}
+
+The application was tested to ensure correct functionality and compatibility with the reference environment.
+
+\section{Manual Testing}
+\begin{itemize}
+  \item \textbf{Client-Server Transfer}: Tested on Debian and WSL2 by sending text and binary files (e.g., \texttt{test.txt}, \texttt{video.mp4}) to localhost and remote IPs (IPv4 and IPv6). 
+  Files were successfully transferred, decrypted, and saved with correct contents, using the filename from the \texttt{METADATA} packet.
+  \item \textbf{Error Handling}: Invalid inputs (e.g., missing \texttt{-r}, non-existent files, invalid IPs) were tested, confirming appropriate error messages on \verb|stderr|.
+  \item \textbf{Multiple Clients}: Multiple clients were run simultaneously, sending files to the server, which correctly reconstructed each file using \texttt{clientId}.
+\end{itemize}
+
+\section{Wireshark Testing}
+The application was tested using Wireshark to verify ICMP/ICMPv6 packet structure and content \cite{libpcap}. 
+Captured packets confirmed correct \texttt{METADATA} and \texttt{DATA} packet formats, proper sequence 
+numbering, and inclusion of the \verb|0xDEADBEEF| magic number.
+
+\section{Reference Environment}
+The application was compiled on \verb|merlin.fit.vutbr.cz| using GCC 12.5.0, OpenSSL 3.0.17, and GNU Make 4.3, 
+ensuring portability and compliance with the task’s reference environment. The application was tested on WSL2 and 
+Debian GNU/Linux.
+
 %=========================================================================
 
 % For compilation piecewise (see projekt.tex), it is necessary to uncomment it

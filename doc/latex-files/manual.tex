@@ -251,28 +251,28 @@
 
   % Pouzita literatura / Bibliography
   % ----------------------------------------------
-% \ifslovak
-%   \makeatletter
-%   \def\@openbib@code{\addcontentsline{toc}{chapter}{Literatúra}}
-%   \makeatother
-%   \bibliographystyle{bib-styles/Pysny/skplain}
-% \else
-%   \ifczech
-%     \makeatletter
-%     \def\@openbib@code{\addcontentsline{toc}{chapter}{Literatura}}
-%     \makeatother
-%     \bibliographystyle{bib-styles/Pysny/czplain}
-%   \else 
-%     \makeatletter
-%     \def\@openbib@code{\addcontentsline{toc}{chapter}{Bibliography}}
-%     \makeatother
-%     \bibliographystyle{bib-styles/Pysny/enplain}
-%   %  \bibliographystyle{alpha}
-%   \fi
-% \fi
-%   \begin{flushleft}
-%   \bibliography{manual-20-literatura-bibliography}
-%   \end{flushleft}
+\ifslovak
+  \makeatletter
+  \def\@openbib@code{\addcontentsline{toc}{chapter}{Literatúra}}
+  \makeatother
+  \bibliographystyle{bib-styles/Pysny/skplain}
+\else
+  \ifczech
+    \makeatletter
+    \def\@openbib@code{\addcontentsline{toc}{chapter}{Literatura}}
+    \makeatother
+    \bibliographystyle{bib-styles/Pysny/czplain}
+  \else 
+    \makeatletter
+    \def\@openbib@code{\addcontentsline{toc}{chapter}{Bibliography}}
+    \makeatother
+    \bibliographystyle{bib-styles/Pysny/enplain}
+  %  \bibliographystyle{alpha}
+  \fi
+\fi
+  \begin{flushleft}
+  \bibliography{manual-20-literatura-bibliography}
+  \end{flushleft}
 
 %   % vynechani stranky v oboustrannem rezimu
 %   % Skip the page in the two-sided mode

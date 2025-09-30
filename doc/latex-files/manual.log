@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.9.19)  29 SEP 2025 21:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.9.19)  30 SEP 2025 14:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -656,7 +656,7 @@ File: t1qhv.fd 2009/09/25 v1.2 font definition file for T1/qhv
 \@sirkartext=\skip84
 \@vyskaobr=\skip85
 \@sirkaobr=\skip86
-<template-fig/VUT_symbol_barevne_CMYK_CZ.pdf, id=13, 167.13641pt x 165.87971pt>
+<template-fig/VUT_symbol_barevne_CMYK_CZ.pdf, id=69, 167.13641pt x 165.87971pt>
 
 File: template-fig/VUT_symbol_barevne_CMYK_CZ.pdf Graphic file (type pdf)
 <use template-fig/VUT_symbol_barevne_CMYK_CZ.pdf>
@@ -688,12 +688,23 @@ LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./template-fig/VUT_symbol_
-barevne_CMYK_CZ.pdf>] [2] (./manual.toc)
+barevne_CMYK_CZ.pdf>] [2] (./manual.toc<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<om
+x.cmap>>
+LaTeX Font Info:    Trying to load font information for U+msa on input line 4.
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 4.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+))
 \tf@toc=\write4
 \openout4 = `manual.toc'.
 
- (./manual-01-kapitoly-chapters-en.texpdfTeX warning (ext4): destination with t
-he same identifier (name{page.1}) has been already used, duplicate ignored
+
+(./manual-01-kapitoly-chapters-en.texpdfTeX warning (ext4): destination with th
+e same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.9 \chapter
@@ -702,57 +713,98 @@ l.9 \chapter
 
 ]
 Chapter 1.
-pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
-been already used, duplicate ignored
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
+6.
+(/usr/share/texmf/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
+8.
+
+(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has
+ been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.13 \chapter
-             {Design} [2
+l.32 \chapter
+             {Usage} [2
 
 ]
 Chapter 2.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-5.
-(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
-9.
+[3
 
-(/usr/share/texmf/tex/latex/lm/ts1lmr.fd
-File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
-))
+] [4]
+Chapter 3.
+[5
+
+] [6]
+Overfull \hbox (7.53804pt too wide) in paragraph at lines 179--180
+[]\T1/lmr/bx/n/10.95 Hardcoded Lo-gin\T1/lmr/m/n/10.95 : The en-cryp-tion key i
+s de-rived from the hard-coded lo-gin [][]\T1/lmtt/m/n/10.95 xrepcim00
+ []
+
+
+Overfull \hbox (48.86102pt too wide) in paragraph at lines 181--182
+\T1/lmr/m/n/10.95 name of the file be-ing sent, ex-tracted from the file path u
+s-ing [][]\T1/lmtt/m/n/10.95 file_handler::getNameFromPath[]\T1/lmr/m/n/10.95 .
+ 
+ []
+
+[7]
+Chapter 4.
+
+Overfull \hbox (0.7828pt too wide) in paragraph at lines 204--205
+[]\T1/lmr/bx/n/10.95 Client ID Col-li-sions\T1/lmr/m/n/10.95 : Al-though the 64
+-bit \T1/lmtt/m/n/10.95 clientId \T1/lmr/m/n/10.95 gen-er-ated by [][]\T1/lmtt/
+m/n/10.95 std::mt19937_64
+ []
+
+[8
+
+] [9]
+Chapter 5.
+
+Overfull \hbox (0.96577pt too wide) in paragraph at lines 225--228
+\T1/lmr/m/n/10.95 The ap-pli-ca-tion was com-piled on [][]\T1/lmtt/m/n/10.95 me
+rlin.fit.vutbr.cz []\T1/lmr/m/n/10.95 us-ing GCC 12.5.0, OpenSSL 3.0.17,
+ []
+
+) (./manual.bbl [10
+
+])
 \c@ttl@toc@chapters=\count346
-
-(./manual-30-prilohy-appendices-en.tex)
+ (./manual-30-prilohy-appendices-en.tex)
 \tf@ptc=\write5
 \openout5 = `manual.ptc'.
 
- [3
+ [11
 
-] (./manual.aux)
+]
+(./manual.aux)
 Package rerunfilecheck Info: File `manual.out' has not changed.
-(rerunfilecheck)             Checksum: 6B0BDB427C929E190704732B48143F4D;156.
+(rerunfilecheck)             Checksum: CD12C75C3E957D29DA45D31C0ECD8705;2149.
  ) 
 Here is how much of TeX's memory you used:
- 15785 strings out of 479415
- 249873 string characters out of 5870760
- 564747 words of memory out of 5000000
- 33489 multiletter control sequences out of 15000+600000
- 519148 words of font info for 58 fonts, out of 8000000 for 9000
+ 15988 strings out of 479415
+ 252450 string characters out of 5870760
+ 571998 words of memory out of 5000000
+ 33579 multiletter control sequences out of 15000+600000
+ 543935 words of font info for 92 fonts, out of 8000000 for 9000
  428 hyphenation exceptions out of 8191
- 70i,5n,77p,804b,366s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf/fonts/enc/d
-vips/lm/lm-ec.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/opensans/a_jg4
+ 70i,5n,77p,544b,501s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dv
+ips/lm/lm-ts1.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/opensans/a_jg4
 h6q.enc}</usr/share/texlive/texmf-dist/fonts/type1/ascender/opensans/OpenSans-B
-old.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fo
-nts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pf
-b></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share/texmf/fonts/ty
-pe1/public/lm/lmtt10.pfb>
-Output written on manual.pdf (5 pages, 402419 bytes).
+old.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pf
+b></usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/ty
+pe1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmcsc10.pfb></
+usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/p
+ublic/lm/lmri10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt10.pfb>
+Output written on manual.pdf (13 pages, 480543 bytes).
 PDF statistics:
- 97 PDF objects out of 1000 (max. 8388607)
- 64 compressed objects within 1 object stream
- 7 named destinations out of 1000 (max. 500000)
- 32 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 276 PDF objects out of 1000 (max. 8388607)
+ 227 compressed objects within 3 object streams
+ 56 named destinations out of 1000 (max. 500000)
+ 160 words of extra memory for PDF output out of 10000 (max. 10000000)
 

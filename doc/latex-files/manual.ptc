@@ -1,5 +1,21 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{\numberline {1}Overview}{2}{chapter.1}%
-\contentsline {chapter}{\numberline {2}Design}{3}{chapter.2}%
+\contentsline {chapter}{\numberline {2}Usage}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Installation}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Exectuion}{4}{section.2.2}%
+\contentsline {paragraph}{Starting the server (listening mode)}{4}{section*.8}%
+\contentsline {paragraph}{Sending a file (client mode)}{4}{section*.9}%
+\contentsline {chapter}{\numberline {3}Implementation Details}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Code Structure}{5}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Custom Protocol}{6}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Design Choices and Assumptions}{7}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Additional Functionality and Limitations}{8}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Multiple Client Support}{8}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Limitations}{8}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Testing}{10}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Manual Testing}{10}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Wireshark Testing}{10}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Reference Environment}{10}{section.5.3}%
+\contentsline {chapter}{Bibliography}{11}{chapter*.13}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 
