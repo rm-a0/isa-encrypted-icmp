@@ -6,6 +6,7 @@ INCDIR = inc
 BUILDDIR = build
 
 SRCS = $(wildcard $(SRCDIR)/*.cpp)
+HDRS = $(wildcard $(INCDIR)/*.hpp)
 OBJS = $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SRCS))
 
 TARGET = secret
@@ -23,9 +24,8 @@ $(BUILDDIR):
 
 run: $(TARGET)
 	./$(TARGET)
-zip:
-	zip -r xrepcim00.zip . -x ".*" "build/*" "test/*" "secret" "test_env/*"
-
+tar:
+	tar -cvf xrepcim00.tar $(SRCS) $(HDRS) Makefile secret.1 manual.pdf
 clean:
 	rm -rf $(BUILDDIR) $(TARGET)
 
