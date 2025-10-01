@@ -170,7 +170,7 @@ bool Server::startPacketCapture(void) {
     }
     
     struct bpf_program fp;
-    char filter_exp[] = "icmp or icmp6";
+    char filter_exp[] = "icmp[icmptype] = icmp-echo or icmp6[icmp6type] = icmp6-echo";
     if (pcap_compile(handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1) {
         std::cerr << "[SERVER] pcap_compiler failed: " << pcap_geterr(handle) << std::endl;
         pcap_close(handle);
