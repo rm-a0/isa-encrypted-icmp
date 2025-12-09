@@ -112,6 +112,7 @@ void Server::packetConsumerLoop(void) {
 
             packet = std::move(packetQueue.front());
             packetQueue.pop();
+            if (!packet) continue;
         }
 
         uint64_t clientId = packet->id;
@@ -152,13 +153,16 @@ void Server::packetCaptureLoop(u_char* user, const struct pcap_pkthdr* header, c
         payload = reinterpret_cast<const uint8_t*>(icmpHeader + sizeof(struct icmp6_hdr));
     }
 
-    protocol::PacketPtr packetPtr = protocol::parsePacket(payload, payloadLen);
+    if (!payload || payloadLen == 0) return;
+    try {
+        protocol::PacketPtr packetPtr = protocol::parsePacket(payload, payloadLen);
 
-    {
-        std::lock_guard<std::mutex> lock(self->queueMutex);
-        self->packetQueue.push(std::move(packetPtr));
-    }
-    self->queueCV.notify_one();
+        if (packetPtr) {
+            std::lock_guard<std::mutex> lock(self->queueMutex);
+            self->packetQueue.push(std::move(packetPtr));
+            self->queueCV.notify_one();
+        }
+    } catch (...) {}
 }
 
 bool Server::startPacketCapture(void) {
